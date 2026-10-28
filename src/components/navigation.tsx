@@ -9,9 +9,9 @@ import { useNEAR } from '../context/useNear'
 import { NEAR } from 'near-api-js/tokens'
 
 export const Navigation = () => {
-  const [action, setAction] = useState(() => {})
+  const [action, setAction] = useState<() => void>(() => () => {})
   const [label, setLabel] = useState('Loading...')
-  const [balance, setBalance] = useState(0)
+  const [balance, setBalance] = useState<string>('0')
   const { authenticated, user } = usePrivy()
 
   const { login: privyLogin } = useLogin()
@@ -20,27 +20,23 @@ export const Navigation = () => {
   const { walletId, nearAccount } = useNEAR()
 
   useEffect(() => {
-    if (authenticated) {
-      const userId = user.google
-        ? user.google.email
-        : user.email
-          ? user.email.address
-          : user.github.username
+    if (authenticated && user) {
+      const userId = user.google?.email ?? user.email?.address ?? user.github?.username ?? 'User'
       setAction(() => privyLogout)
       setLabel(`Logout ${userId}`)
     } else {
       setAction(() => privyLogin)
       setLabel('Login')
-      setBalance(null)
+      setBalance('0')
     }
   }, [authenticated, privyLogin, privyLogout, user])
 
   useEffect(() => {
-    if (walletId) {
+    if (walletId && nearAccount) {
       nearAccount
         .getBalance()
         .then((b) => setBalance(Number(NEAR.toDecimal(b)).toFixed(2)))
-        .catch(() => setBalance(0)) // non existing account
+        .catch(() => setBalance('0')) // non existing account
     }
   }, [walletId, nearAccount])
 

@@ -1,10 +1,18 @@
 import { Account, PublicKey, Signer } from 'near-api-js'
+import type { JsonRpcProvider } from 'near-api-js'
+import type { useSignRawHash } from '@privy-io/react-auth/extended-chains'
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils'
 
 // Keep Privy's embedded wallet as the signer. The SDK handles transaction,
 // delegate-action and NEP-413 serialization and hashing consistently.
+type SignRawHash = ReturnType<typeof useSignRawHash>['signRawHash']
+
 export class privySigner extends Signer {
-  constructor(signRawHash, nearAccId, provider) {
+  private signRawHash: SignRawHash
+  private nearAccId: string
+  private provider: JsonRpcProvider
+
+  constructor(signRawHash: SignRawHash, nearAccId: string, provider: JsonRpcProvider) {
     super()
     this.signRawHash = signRawHash
     this.nearAccId = nearAccId
@@ -21,7 +29,7 @@ export class privySigner extends Signer {
     return PublicKey.fromString(keys[0].public_key)
   }
 
-  async signBytes(bytes) {
+  async signBytes(bytes: Uint8Array) {
     const { signature } = await this.signRawHash({
       address: this.nearAccId,
       chainType: 'near',

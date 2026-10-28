@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { KeyPair, Transaction } from 'near-api-js';
 import { hexToBytes, bytesToHex } from '@noble/hashes/utils';
-import { privySigner } from '../src/context/signer.js';
+import { privySigner } from '../src/context/signer.ts';
 
 test('Privy signs the SDK transaction hash and returns a verifiable SDK outcome', async () => {
   const key = KeyPair.fromRandom('ed25519');

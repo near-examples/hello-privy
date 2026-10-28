@@ -8,7 +8,7 @@ import { JsonRpcProvider } from 'near-api-js'
 import { Account } from 'near-api-js'
 
 // config
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type PropsWithChildren } from 'react'
 import { useState } from 'react'
 import { NearContext } from './useNear'
 import { providerUrl } from '../config'
@@ -17,11 +17,10 @@ import { privySigner } from './signer'
 // Provider
 const provider = new JsonRpcProvider({ url: providerUrl })
 
-// eslint-disable-next-line react/prop-types
-export function NEARxPrivy({ children }) {
+export function NEARxPrivy({ children }: PropsWithChildren) {
   const { authenticated, user } = usePrivy()
   const [walletId, setWalletId] = useState('')
-  const [nearAccount, setNearAccount] = useState(null)
+  const [nearAccount, setNearAccount] = useState<Account | null>(null)
 
   const { signRawHash } = useSignRawHash()
   const { createWallet } = useCreateWallet()
@@ -39,7 +38,7 @@ export function NEARxPrivy({ children }) {
     const nearWallet = user.linkedAccounts.find((account) =>
       account.type === 'wallet' && account.chainType === 'near'
     )
-    if (!nearWallet) {
+    if (nearWallet?.type !== 'wallet') {
       if (!creatingWallet.current) {
         creatingWallet.current = true
         createWallet({ chainType: 'near' })

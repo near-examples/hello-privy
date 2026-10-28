@@ -21,8 +21,8 @@ export default function HelloNear() {
   const { provider, nearAccount } = useNEAR()
 
   const fetchGreeting = useCallback(async () => {
-    const greeting = await provider.callFunction({ contractId: CONTRACT, method: 'get_greeting', args: {} })
-    setGreeting(greeting)
+    const greeting = await provider.callFunction<string>({ contractId: CONTRACT, method: 'get_greeting', args: {} })
+    setGreeting(greeting ?? '')
   }, [provider])
 
   const saveGreeting = async () => {
@@ -36,7 +36,7 @@ export default function HelloNear() {
       })
       await fetchGreeting()
     } catch (error) {
-      alert(`Error saving greeting: ${error.message}. Make sure your account has NEAR for gas.`)
+      alert(`Error saving greeting: ${error instanceof Error ? error.message : String(error)}. Make sure your account has NEAR for gas.`)
     } finally {
       setShowSpinner(false)
     }
